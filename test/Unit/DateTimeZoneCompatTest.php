@@ -1,12 +1,20 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: jason
- * Date: 9/7/13
- * Time: 8:44 PM
- * To change this template use File | Settings | File Templates.
+ * Tests for the compatibility library with PHP 5.2+ DateTimeZone class
+ *
+ * @author Jason Varnedoe <jason@fuzzystatic.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 2013 Jason Varnedoe
  */
 
 class DateTimeZoneCompatTest extends PHPUnit_Framework_TestCase {
+
+    /**
+     * @test
+     * @covers DateTimeZoneCompat::__construct
+     */
+    public function constructReturnsDateTimeCompat() {
+        $this->assertInstanceOf("DateTimeZoneCompat", new DateTimeZoneCompat());
+    }
 
 }
