@@ -2,8 +2,8 @@
 /**
  * Tests for the compatibility library with PHP 5.2+ DateTimeZone class
  *
- * @author Jason Varnedoe <jason@fuzzystatic.com>
- * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @author    Jason Varnedoe <jason@fuzzystatic.com>
+ * @license   http://www.opensource.org/licenses/mit-license.html MIT License
  * @copyright 2013 Jason Varnedoe
  */
 
@@ -14,9 +14,10 @@ class DateTimeZoneCompatTest extends PHPUnit_Framework_TestCase {
     protected $valid = array();
 
     protected function setUp() {
-        if(ini_get('date.timezone')) {
+        if (ini_get('date.timezone')) {
             $this->sys_tz = ini_get('date.timezone');
-        } else {
+        }
+        else {
             $this->sys_tz = date_default_timezone_get();
         }
 
@@ -65,9 +66,10 @@ class DateTimeZoneCompatTest extends PHPUnit_Framework_TestCase {
 
         /** for this to work, must set to the expected timezone ourselves and see if we are in DST */
         date_default_timezone_set($this->valid['construct']['name']);
-        if(date('I')) {
+        if (date('I')) {
             $offset = $this->valid['construct']['offset_dst'];
-        } else {
+        }
+        else {
             $offset = $this->valid['construct']['offset'];
         }
         date_default_timezone_set($this->sys_tz);

@@ -2,8 +2,8 @@
 /**
  * Tests for the compatibility library with PHP 5.2+ DateTime class
  *
- * @author Jason Varnedoe <jason@fuzzystatic.com>
- * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @author    Jason Varnedoe <jason@fuzzystatic.com>
+ * @license   http://www.opensource.org/licenses/mit-license.html MIT License
  * @copyright 2013 Jason Varnedoe
  */
 
@@ -78,9 +78,9 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
         );
 
         $this->data['offset'] = array(
-            'datetime'   => '2013-08-30 00:00:00',
-            'timezone'       => 'America/Chicago',
-            'offset' => '-18000'
+            'datetime' => '2013-08-30 00:00:00',
+            'timezone' => 'America/Chicago',
+            'offset'   => '-18000'
         );
     }
 
@@ -107,7 +107,7 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
      */
     public function formatReturnsDateTimeString() {
         $dummy = new DateTimeCompat($this->data['formattest']['date']);
-        $this->assertEquals($this->data['formattest']['date'],$dummy->format($this->data['formattest']['format']));
+        $this->assertEquals($this->data['formattest']['date'], $dummy->format($this->data['formattest']['format']));
     }
 
     /**
@@ -135,7 +135,7 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
     public function modifyAddsProperly() {
         $dummy = new DateTimeCompat($this->data['modifytest1']['startdate']);
         $dummy->modify($this->data['modifytest1']['modify']);
-        $this->assertEquals($this->data['modifytest1']['date'],$dummy->format($this->data['modifytest1']['format']));
+        $this->assertEquals($this->data['modifytest1']['date'], $dummy->format($this->data['modifytest1']['format']));
     }
 
     /**
@@ -145,7 +145,7 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
     public function modifySubsProperly() {
         $dummy = new DateTimeCompat($this->data['modifytest2']['startdate']);
         $dummy->modify($this->data['modifytest2']['modify']);
-        $this->assertEquals($this->data['modifytest2']['date'],$dummy->format($this->data['modifytest2']['format']));
+        $this->assertEquals($this->data['modifytest2']['date'], $dummy->format($this->data['modifytest2']['format']));
     }
 
     /**

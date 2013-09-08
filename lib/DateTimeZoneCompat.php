@@ -2,8 +2,8 @@
 /**
  * A compatibility library with PHP 5.2+ DateTimeZone class
  *
- * @author Jason Varnedoe <jason@fuzzystatic.com>
- * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @author    Jason Varnedoe <jason@fuzzystatic.com>
+ * @license   http://www.opensource.org/licenses/mit-license.html MIT License
  * @copyright 2013 Jason Varnedoe
  */
 
@@ -15,13 +15,14 @@ class DateTimeZoneCompat {
     protected $name;
 
     public function __construct($input) {
-        if(ini_get('date.timezone')) {
+        if (ini_get('date.timezone')) {
             $this->system_tz = ini_get('date.timezone');
-        } else {
+        }
+        else {
             $this->system_tz = date_default_timezone_get();
         }
 
-        if(!$this->setName($input)) {
+        if (!$this->setName($input)) {
             throw new Exception(__CLASS__ . '::' . __METHOD__ . ': Unkonwn or bad timezone (' . $input . ')');
         }
 
@@ -32,10 +33,11 @@ class DateTimeZoneCompat {
      * Sets the TZ Name (checking to see if it's valid first)
      *
      * @param $input
+     *
      * @return bool
      */
     protected function setName($input) {
-        if(!date_default_timezone_set($input)) {
+        if (!date_default_timezone_set($input)) {
             return false;
         }
         $this->name = $input;
@@ -57,15 +59,17 @@ class DateTimeZoneCompat {
      * Returns the offset to UTC for the input date/time in seconds.
      *
      * @param DateTimeCompat $input
+     *
      * @return int
      */
     public function getOffset(DateTimeCompat $input) {
         date_default_timezone_set($this->getName());
         $temp = date('Z', $input->getTimestamp());
         date_default_timezone_set($this->system_tz);
-        if($temp) {
+        if ($temp) {
             return (int)$temp;
-        } else {
+        }
+        else {
             return false;
         }
     }

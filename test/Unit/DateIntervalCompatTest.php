@@ -2,8 +2,8 @@
 /**
  * Tests for the compatibility library with PHP 5.3+ DateInterval class
  *
- * @author Jason Varnedoe <jason@fuzzystatic.com>
- * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @author    Jason Varnedoe <jason@fuzzystatic.com>
+ * @license   http://www.opensource.org/licenses/mit-license.html MIT License
  * @copyright 2013 Jason Varnedoe
  */
 
@@ -14,7 +14,7 @@ class DateIntervalCompatTest extends PHPUnit_Framework_TestCase {
 
 
     public function setUp() {
-        $this->valid['full'] = array (
+        $this->valid['full'] = array(
             'interval' => 'P2Y3M4DT6H8M3S',
             'year'     => 2,
             'month'    => 3,
@@ -24,7 +24,7 @@ class DateIntervalCompatTest extends PHPUnit_Framework_TestCase {
             'second'   => 3
         );
 
-        $this->valid['part'] = array (
+        $this->valid['part'] = array(
             'interval' => 'P2Y4MT6H3S',
             'year'     => 2,
             'month'    => 4,

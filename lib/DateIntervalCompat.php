@@ -2,8 +2,8 @@
 /**
  * A compatibility library with PHP 5.3+ DateInterval class
  *
- * @author Jason Varnedoe <jason@fuzzystatic.com>
- * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @author    Jason Varnedoe <jason@fuzzystatic.com>
+ * @license   http://www.opensource.org/licenses/mit-license.html MIT License
  * @copyright 2013 Jason Varnedoe
  */
 
@@ -28,21 +28,23 @@ class DateIntervalCompat {
 
     /**
      * @param $input
+     *
      * @throws Exception
      * @returns DateIntervalCompat
      */
     public function __construct($input) {
         $temp = array();
         $rtn = preg_match('/^(-|)?P([0-9]+Y|)?([0-9]+M|)?([0-9]+W|)?([0-9]+D|)?T?([0-9]+H|)?([0-9]+M|)?([0-9]+S|)?$/', $input, $temp);
-        if(empty($temp) || $rtn === false || $rtn === 0) {
-            throw new Exception(__CLASS__."::".__METHOD__.": Unknown or bad format (".$input.")");
+        if (empty($temp) || $rtn === false || $rtn === 0) {
+            throw new Exception(__CLASS__ . "::" . __METHOD__ . ": Unknown or bad format (" . $input . ")");
         }
 
         $this->y = (int)$temp[2];
         $this->m = (int)$temp[3];
-        if($temp[5] != 0) {
+        if ($temp[5] != 0) {
             $this->d = (int)$temp[5];
-        } else {
+        }
+        else {
             $this->d = 7 * (int)$temp[4];
         }
         $this->h = (int)$temp[6];
@@ -56,17 +58,18 @@ class DateIntervalCompat {
      * Sets up a DateIntervalCompat from the relative parts of the string
      *
      * @param $input
+     *
      * @return DateIntervalCompat
      * @todo attempt to handle more than strings
      */
     public static function createFromDateString($input) {
         $temp_ts = time();
         $temp = strtotime($input, $temp_ts);
-        if($temp === false || $temp == -1) {
+        if ($temp === false || $temp == -1) {
             return new DateIntervalCompat('PT0S');
         }
 
-        return new DateIntervalCompat('PT'. abs($temp - $temp_ts) .'S');
+        return new DateIntervalCompat('PT' . abs($temp - $temp_ts) . 'S');
 
     }
 
@@ -74,19 +77,22 @@ class DateIntervalCompat {
      * Formats the interval
      *
      * @param $input
+     *
      * @return string
      * @todo Ugly hack, bad attempt at a parser
      */
     public function format($input) {
         $temp = explode('%', $input);
         $rtrn = "";
-        for($i = 0; $i <= (count($temp)-1); $i++) {
-            if($i == 0) {
+        for ($i = 0; $i <= (count($temp) - 1); $i++) {
+            if ($i == 0) {
                 $rtrn .= $temp[$i];
-            } elseif(strlen($temp[$i]) == 0) {
+            }
+            elseif (strlen($temp[$i]) == 0) {
                 $rtrn .= '%';
-            } else {
-                switch($temp[$i][0]) {
+            }
+            else {
+                switch ($temp[$i][0]) {
                     case 'Y':
                         $rtrn .= str_pad($this->y, 2, '0', STR_PAD_LEFT) . substr($temp[$i], 1);
                         break;
@@ -106,9 +112,10 @@ class DateIntervalCompat {
                         $rtrn .= $this->d . substr($temp[$i], 1);
                         break;
                     case 'a':
-                        if($this->days) {
+                        if ($this->days) {
                             $rtrn .= $this->days . substr($temp[$i], 1);
-                        } else {
+                        }
+                        else {
                             $rtrn .= '(unknown)';
                         }
                         break;
@@ -131,15 +138,16 @@ class DateIntervalCompat {
                         $rtrn .= $this->s . substr($temp[$i], 1);
                         break;
                     case 'R':
-                        if($this->invert) {
+                        if ($this->invert) {
                             $rtrn .= '-';
-                        } else {
+                        }
+                        else {
                             $rtrn .= '+';
                         }
                         $rtrn .= substr($temp[$i], 1);
                         break;
                     case 'r':
-                        if($this->invert) {
+                        if ($this->invert) {
                             $rtrn .= '-';
                         }
                         $rtrn .= substr($temp[$i], 1);
@@ -149,6 +157,7 @@ class DateIntervalCompat {
                 }
             }
         }
+
         return $rtrn;
     }
 

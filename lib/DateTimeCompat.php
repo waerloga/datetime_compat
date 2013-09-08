@@ -2,13 +2,12 @@
 /**
  * A compatibility library with PHP 5.2+ DateTime class
  *
- * @author Jason Varnedoe <jason@fuzzystatic.com>
- * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @author    Jason Varnedoe <jason@fuzzystatic.com>
+ * @license   http://www.opensource.org/licenses/mit-license.html MIT License
  * @copyright 2013 Jason Varnedoe
  */
 
-class DateTimeCompat
-{
+class DateTimeCompat {
 
     /** @var string */
     public $date;
@@ -24,17 +23,18 @@ class DateTimeCompat
     /**
      * Returns a new DateTimeCompat object
      *
-     * @param string $input
+     * @param string             $input
      * @param DateTimeZoneCompat $timezone
+     *
      * @throws Exception
      * @returns DateTimeCompat
      * @todo Better TZ handling
      */
-    public function __construct($input = "now", DateTimeZoneCompat $timezone = null)
-    {
+    public function __construct($input = "now", DateTimeZoneCompat $timezone = null) {
         if (ini_get('date.timezone')) {
             $this->system_tz = ini_get('date.timezone');
-        } else {
+        }
+        else {
             $this->system_tz = date_default_timezone_get();
         }
 
@@ -44,7 +44,8 @@ class DateTimeCompat
 
         if ($timezone === null) {
             $this->setTimezone(new DateTimeZoneCompat($this->system_tz));
-        } else {
+        }
+        else {
             $this->setTimezone($timezone);
         }
 
@@ -54,12 +55,12 @@ class DateTimeCompat
     /**
      * Helper function for refactorability
      *
-     * @param string $input
+     * @param string   $input
      * @param null|int $now
+     *
      * @return bool
      */
-    protected function strtotime($input, $now = null)
-    {
+    protected function strtotime($input, $now = null) {
         if ($now === null) {
             $now = time();
         }
@@ -68,6 +69,7 @@ class DateTimeCompat
             return false;
         }
         $this->setTimestamp($temp);
+
         return true;
     }
 
@@ -76,8 +78,7 @@ class DateTimeCompat
      *
      * @todo make it go
      */
-    public static function createFromFormat()
-    {
+    public static function createFromFormat() {
     }
 
     /**
@@ -85,17 +86,17 @@ class DateTimeCompat
      *
      * @todo make it go
      */
-    public static function getLastErrors()
-    {
+    public static function getLastErrors() {
     }
 
     /**
      * Returns date formatted according to a given format
+     *
      * @param string $input
+     *
      * @return string|boolean
      */
-    public function format($input)
-    {
+    public function format($input) {
         date_default_timezone_set($this->getTimezone()->getName());
         $rtrn = date($input, $this->getTimestamp());
         date_default_timezone_set($this->system_tz);
@@ -108,8 +109,7 @@ class DateTimeCompat
      *
      * @return DateTimeZoneCompat
      */
-    public function getTimezone()
-    {
+    public function getTimezone() {
         return $this->timezone;
     }
 
@@ -117,12 +117,13 @@ class DateTimeCompat
      * Sets the timezone of the DateTimeCompat object
      *
      * @param DateTimeZoneCompat $input
+     *
      * @return $this
      */
-    public function setTimezone(DateTimeZoneCompat $input)
-    {
+    public function setTimezone(DateTimeZoneCompat $input) {
         $this->timezone = $input;
         $this->setTimestamp($this->getTimestamp());
+
         return $this;
     }
 
@@ -131,8 +132,7 @@ class DateTimeCompat
      *
      * @return int
      */
-    public function getTimestamp()
-    {
+    public function getTimestamp() {
         return $this->timestamp;
     }
 
@@ -140,20 +140,20 @@ class DateTimeCompat
      * Sets the date and time based on an Unix timestamp
      *
      * @param int $input
+     *
      * @return DateTimeCompat|bool
      */
-    public function setTimestamp($input)
-    {
+    public function setTimestamp($input) {
         if (!$temp = date('Y-m-d H:i:s', $input)) {
             return false;
         }
         $this->timestamp = $input;
         $this->date = $temp;
+
         return $this;
     }
 
-    public function modify($input)
-    {
+    public function modify($input) {
         if (!$this->strtotime($input, $this->getTimestamp())) {
             return false;
         }
@@ -165,13 +165,14 @@ class DateTimeCompat
      * Subtracts an amount of days, months, years, hours, minutes, and seconds from a DateTimeCompat object
      *
      * @param DateIntervalCompat $input
+     *
      * @return DateTimeCompat|boolean
      */
-    public function sub($input)
-    {
+    public function sub($input) {
         if ($input->invert) {
             $input->invert = 0;
-        } else {
+        }
+        else {
             $input->invert = 1;
         }
 
@@ -182,10 +183,10 @@ class DateTimeCompat
      * Adds an amount of days, months, years, hours, minutes, and seconds to a DateTimeCompat object
      *
      * @param DateIntervalCompat $input
+     *
      * @return DateTimeCompat|boolean
      */
-    public function add(DateIntervalCompat $input)
-    {
+    public function add(DateIntervalCompat $input) {
 
         if (!$this->strtotime($input->format('%R%y year %R%m month %R%d day %R%h hour %R%i minute %R%s second'), $this->getTimestamp())) {
             return false;
@@ -198,15 +199,16 @@ class DateTimeCompat
      * Returns the difference between two DateTimeCompat objects
      *
      * @param DateTimeCompat $input
-     * @param bool $absolute
+     * @param bool           $absolute
+     *
      * @return DateIntervalCompat
      */
-    public function diff(DateTimeCompat $input, $absolute = false)
-    {
+    public function diff(DateTimeCompat $input, $absolute = false) {
         if ($this->getTimestamp() > $input->getTimestamp()) {
             $a = $input->getTimestamp();
             $b = $this->getTimestamp();
-        } else {
+        }
+        else {
             $a = $this->getTimestamp();
             $b = $input->getTimestamp();
         }
@@ -228,7 +230,8 @@ class DateTimeCompat
 
         if ($input->getTimestamp() > $this->getTimestamp()) {
             $invert = 0;
-        } else {
+        }
+        else {
             $invert = 1;
         }
 
@@ -244,6 +247,7 @@ class DateTimeCompat
             $rtrn->invert = $invert;
         }
         $rtrn->days = (int)floor(abs($input->getTimestamp() - $this->getTimestamp()) / $this->sec_in_day);
+
         return $rtrn;
     }
 
@@ -253,13 +257,14 @@ class DateTimeCompat
      * @param int $year
      * @param int $month
      * @param int $day
+     *
      * @return DateTimeCompat|boolean
      */
-    public function setDate($year, $month, $day)
-    {
+    public function setDate($year, $month, $day) {
         if (!$this->strtotime($year . '-' . $month . '-' . $day . ' ' . date('H:i:s', $this->getTimestamp()))) {
             return false;
         }
+
         return $this;
     }
 
@@ -269,13 +274,14 @@ class DateTimeCompat
      * @param int $hour
      * @param int $minute
      * @param int $second
+     *
      * @return DateTimeCompat|boolean
      */
-    public function setTime($hour, $minute, $second = 0)
-    {
+    public function setTime($hour, $minute, $second = 0) {
         if (!$this->strtotime(date('Y-m-d', $this->getTimestamp()) . ' ' . $hour . ':' . $minute . ':' . $second)) {
             return false;
         }
+
         return $this;
     }
 
@@ -284,8 +290,7 @@ class DateTimeCompat
      *
      * @todo make it go
      */
-    public function setISODate()
-    {
+    public function setISODate() {
 
     }
 
@@ -294,8 +299,7 @@ class DateTimeCompat
      *
      * @return int|bool
      */
-    public function getOffset()
-    {
+    public function getOffset() {
         return $this->getTimezone()->getOffset($this);
     }
 }
