@@ -14,7 +14,6 @@ class DateIntervalCompatTest extends PHPUnit_Framework_TestCase {
 
 
     public function setUp() {
-        /** @var string valid */
         $this->valid['full'] = array (
             'interval' => 'P2Y3M4DT6H8M3S',
             'year'     => 2,
@@ -63,6 +62,16 @@ class DateIntervalCompatTest extends PHPUnit_Framework_TestCase {
             'hour'     => 2,
             'minute'   => 0,
             'second'   => 0
+        );
+
+        $this->valid['datestring'] = array(
+            'interval' => '-3 day',
+            'year'     => 0,
+            'month'    => 0,
+            'day'      => 0,
+            'hour'     => 0,
+            'minute'   => 0,
+            'second'   => 259200
         );
 
         $this->invalid = "NOTVALID";
@@ -155,5 +164,54 @@ class DateIntervalCompatTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($this->valid['timeonly']['hour'], $dummy->h);
         $this->assertEquals($this->valid['timeonly']['minute'], $dummy->i);
         $this->assertEquals($this->valid['timeonly']['second'], $dummy->s);
+    }
+
+    /**
+     * @test
+     * @covers DateIntervalCompat::createFromDateString
+     */
+    public function createFromDateStringInvalidReturnsExcpectedObject() {
+        $dummy = DateIntervalCompat::createFromDateString($this->invalid);
+        $this->assertEquals(0, $dummy->y);
+        $this->assertEquals(0, $dummy->m);
+        $this->assertEquals(0, $dummy->d);
+        $this->assertEquals(0, $dummy->h);
+        $this->assertEquals(0, $dummy->i);
+        $this->assertEquals(0, $dummy->s);
+    }
+
+    /**
+     * @test
+     * @covers DateIntervalCompat::createFromDateString
+     */
+    public function createFromDateStringReturnsExcpectedObject() {
+        $dummy = DateIntervalCompat::createFromDateString($this->valid['datestring']['interval']);
+        $this->assertEquals($this->valid['datestring']['year'], $dummy->y);
+        $this->assertEquals($this->valid['datestring']['month'], $dummy->m);
+        $this->assertEquals($this->valid['datestring']['day'], $dummy->d);
+        $this->assertEquals($this->valid['datestring']['hour'], $dummy->h);
+        $this->assertEquals($this->valid['datestring']['minute'], $dummy->i);
+        $this->assertEquals($this->valid['datestring']['second'], $dummy->s);
+    }
+
+    /**
+     * @test
+     * @covers DateIntervalCompat::format
+     */
+    public function formatReturnsExpectedStrings() {
+        $dummy = new DateIntervalCompat($this->valid['part']['interval']);
+        $this->assertSame((string)$this->valid['part']['year'], $dummy->format('%y'));
+        $this->assertSame('0' . $this->valid['part']['year'], $dummy->format('%Y'));
+        $this->assertSame((string)$this->valid['part']['month'], $dummy->format('%m'));
+        $this->assertSame('0' . $this->valid['part']['month'], $dummy->format('%M'));
+        $this->assertSame($this->valid['part']['day'] . ' ' . $this->valid['part']['hour'], $dummy->format('%d %h'));
+        $this->assertSame('0' . $this->valid['part']['day'] . ' 0' . $this->valid['part']['hour'], $dummy->format('%D %H'));
+        $this->assertSame((string)$this->valid['part']['minute'], $dummy->format('%i'));
+        $this->assertSame('0' . $this->valid['part']['minute'], $dummy->format('%I'));
+        $this->assertSame((string)$this->valid['part']['second'], $dummy->format('%s'));
+        $this->assertSame('0' . $this->valid['part']['second'], $dummy->format('%S'));
+        $this->assertSame('(unknown)', $dummy->format('%a'));
+        $this->assertSame('+', $dummy->format('%R'));
+        $this->assertSame('', $dummy->format('%r'));
     }
 }

@@ -24,7 +24,7 @@ class DateIntervalCompat {
     /** @var int */
     public $invert;
     /** @var int|boolean */
-    public $days;
+    public $days = false;
 
     /**
      * @param $input
@@ -50,15 +50,105 @@ class DateIntervalCompat {
         $this->s = (int)$temp[8];
 
         return $this;
+    }
+
+    /**
+     * Sets up a DateIntervalCompat from the relative parts of the string
+     * FIXME: Unlike DateInterval, this one converts to seconds before creating the new DateIntervalCompat object
+     *
+     * @param $input
+     * @return DateIntervalCompat
+     */
+    public static function createFromDateString($input) {
+        $temp_ts = time();
+        $temp = strtotime($input, $temp_ts);
+        if($temp === false || $temp == -1) {
+            return new DateIntervalCompat('PT0S');
+        }
+
+        return new DateIntervalCompat('PT'. abs($temp - $temp_ts) .'S');
 
     }
 
-    public function createFromDateString() {
-
-    }
-
-    public function format() {
-
+    /**
+     * Formats the interval
+     * FIXME: Ugly hack ahead, explode() + for + if + switch not a parser make
+     * @param $input
+     * @return string
+     */
+    public function format($input) {
+        $temp = explode('%', $input);
+        $rtrn = "";
+        for($i = 0; $i <= (count($temp)-1); $i++) {
+            if($i == 0) {
+                $rtrn .= $temp[$i];
+            } elseif(strlen($temp[$i]) == 0) {
+                $rtrn .= '%';
+            } else {
+                switch($temp[$i][0]) {
+                    case 'Y':
+                        $rtrn .= str_pad($this->y, 2, '0', STR_PAD_LEFT) . substr($temp[$i], 1);
+                        break;
+                    case 'y':
+                        $rtrn .= $this->y . substr($temp[$i], 1);
+                        break;
+                    case 'M':
+                        $rtrn .= str_pad($this->m, 2, '0', STR_PAD_LEFT) . substr($temp[$i], 1);
+                        break;
+                    case 'm':
+                        $rtrn .= $this->m . substr($temp[$i], 1);
+                        break;
+                    case 'D':
+                        $rtrn .= str_pad($this->d, 2, '0', STR_PAD_LEFT) . substr($temp[$i], 1);
+                        break;
+                    case 'd':
+                        $rtrn .= $this->d . substr($temp[$i], 1);
+                        break;
+                    case 'a':
+                        if($this->days) {
+                            $rtrn .= $this->days . substr($temp[$i], 1);
+                        } else {
+                            $rtrn .= '(unknown)';
+                        }
+                        break;
+                    case 'H':
+                        $rtrn .= str_pad($this->h, 2, '0', STR_PAD_LEFT) . substr($temp[$i], 1);
+                        break;
+                    case 'h':
+                        $rtrn .= $this->h . substr($temp[$i], 1);
+                        break;
+                    case 'I':
+                        $rtrn .= str_pad($this->i, 2, '0', STR_PAD_LEFT) . substr($temp[$i], 1);
+                        break;
+                    case 'i':
+                        $rtrn .= $this->i . substr($temp[$i], 1);
+                        break;
+                    case 'S':
+                        $rtrn .= str_pad($this->s, 2, '0', STR_PAD_LEFT) . substr($temp[$i], 1);
+                        break;
+                    case 's':
+                        $rtrn .= $this->s . substr($temp[$i], 1);
+                        break;
+                    case 'R':
+                        if($this->invert) {
+                            $rtrn .= '-';
+                        } else {
+                            $rtrn .= '+';
+                        }
+                        $rtrn .= substr($temp[$i], 1);
+                        break;
+                    case 'r':
+                        if($this->invert) {
+                            $rtrn .= '-';
+                        }
+                        $rtrn .= substr($temp[$i], 1);
+                        break;
+                    default:
+                        $rtrn .= $temp[$i];
+                }
+            }
+        }
+        return $rtrn;
     }
 
 }
