@@ -54,10 +54,10 @@ class DateIntervalCompat {
 
     /**
      * Sets up a DateIntervalCompat from the relative parts of the string
-     * FIXME: Unlike DateInterval, this one converts to seconds before creating the new DateIntervalCompat object
      *
      * @param $input
      * @return DateIntervalCompat
+     * @todo attempt to handle more than strings
      */
     public static function createFromDateString($input) {
         $temp_ts = time();
@@ -72,9 +72,10 @@ class DateIntervalCompat {
 
     /**
      * Formats the interval
-     * FIXME: Ugly hack ahead, explode() + for + if + switch not a parser make
+     *
      * @param $input
      * @return string
+     * @todo Ugly hack, bad attempt at a parser
      */
     public function format($input) {
         $temp = explode('%', $input);
