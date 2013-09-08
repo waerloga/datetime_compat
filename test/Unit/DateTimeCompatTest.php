@@ -37,24 +37,50 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
             'date'      => '2013-08-29 00:00:00'
         );
         $this->data['diff'] = array(
-            'a'         => '2013-08-30 00:00:00',
-            'b'         => '2013-08-30 00:00:10',
-            'diff-sec'  => 10,
-            'diff-else' => 0
+            'a'           => '2013-08-30 00:01:00',
+            'b'           => '2013-08-30 00:00:10',
+            'diff-sec'    => 50,
+            'diff-min'    => 0,
+            'diff-else'   => 0,
+            'diff-invert' => 1
         );
 
         $this->data['add'] = array(
             'startdate' => '2013-08-30 00:00:00',
-            'enddate'   => '2013-08-30 00:00:20',
+            'enddate'   => '2013-09-30 00:10:20',
             'format'    => 'Y-m-d H:i:s',
-            'interval'  => 'PT20S'
+            'interval'  => 'P1MT10M20S'
         );
 
         $this->data['sub'] = array(
             'startdate' => '2013-08-30 00:00:20',
-            'enddate'   => '2013-08-30 00:00:00',
+            'enddate'   => '2013-08-29 00:00:00',
             'format'    => 'Y-m-d H:i:s',
-            'interval'  => 'PT20S'
+            'interval'  => 'P1DT20S'
+        );
+
+        $this->data['setdate'] = array(
+            'startdate' => '2013-08-30 00:10:00',
+            'enddate'   => '2013-08-09 00:10:00',
+            'format'    => 'Y-m-d H:i:s',
+            'set-year'  => 2013,
+            'set-month' => 8,
+            'set-day'   => 9
+        );
+
+        $this->data['settime'] = array(
+            'startdate' => '2013-08-30 00:10:00',
+            'enddate'   => '2013-08-30 01:15:09',
+            'format'    => 'Y-m-d H:i:s',
+            'set-hour'  => 1,
+            'set-min'   => 15,
+            'set-sec'   => 9
+        );
+
+        $this->data['offset'] = array(
+            'datetime'   => '2013-08-30 00:00:00',
+            'timezone'       => 'America/Chicago',
+            'offset' => '-18000'
         );
     }
 
@@ -134,8 +160,9 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($this->data['diff']['diff-else'], $interval->m);
         $this->assertEquals($this->data['diff']['diff-else'], $interval->d);
         $this->assertEquals($this->data['diff']['diff-else'], $interval->h);
-        $this->assertEquals($this->data['diff']['diff-else'], $interval->i);
+        $this->assertEquals($this->data['diff']['diff-min'], $interval->i);
         $this->assertEquals($this->data['diff']['diff-sec'], $interval->s);
+        $this->assertEquals($this->data['diff']['diff-invert'], $interval->invert);
 
     }
 
@@ -161,4 +188,32 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($this->data['sub']['enddate'], $dummy->format($this->data['sub']['format']));
     }
 
+    /**
+     * @test
+     * @covers DateTimeCompat::setDate
+     */
+    public function setDateReturnsExpectedDateTimeCompat() {
+        $dummy = new DateTimeCompat($this->data['setdate']['startdate']);
+        $dummy->setDate($this->data['setdate']['set-year'], $this->data['setdate']['set-month'], $this->data['setdate']['set-day']);
+        $this->assertEquals($this->data['setdate']['enddate'], $dummy->format($this->data['setdate']['format']));
+    }
+
+    /**
+     * @test
+     * @covers DateTimeCompat::setTime
+     */
+    public function setTimeReturnsExpectedDateTimeCompat() {
+        $dummy = new DateTimeCompat($this->data['settime']['startdate']);
+        $dummy->setTime($this->data['settime']['set-hour'], $this->data['settime']['set-min'], $this->data['settime']['set-sec']);
+        $this->assertEquals($this->data['settime']['enddate'], $dummy->format($this->data['settime']['format']));
+    }
+
+    /**
+     * @test
+     * @covers DateTimeCompat::getOffset
+     */
+    public function getOffsetReturnsExpeted() {
+        $dummy = new DateTimeCompat($this->data['offset']['datetime'], new DateTimeZoneCompat($this->data['offset']['timezone']));
+        $this->assertEquals($this->data['offset']['offset'], $dummy->getOffset());
+    }
 }
