@@ -10,6 +10,7 @@
 
 require_once dirname(__FILE__)."/DateTimeCompat.php";
 require_once dirname(__FILE__)."/DateIntervalCompat.php";
+require_once dirname(__FILE__)."/DateTimeZoneCompat.php";
 
 if(!class_exists("DateTime", false)) {
     class DateTime extends DateTimeCompat { }
@@ -17,4 +18,8 @@ if(!class_exists("DateTime", false)) {
 
 if(!class_exists("DateInterval", false)) {
     class DateInterval extends DateIntervalCompat { }
+}
+
+if(!class_exists("DateTimeZone", false)) {
+    class DateTimeZone extends DateTimeZoneCompat { }
 }
