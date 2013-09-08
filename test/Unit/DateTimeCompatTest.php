@@ -36,6 +36,26 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
             'modify'    => '-1 day',
             'date'      => '2013-08-29 00:00:00'
         );
+        $this->data['diff'] = array(
+            'a'         => '2013-08-30 00:00:00',
+            'b'         => '2013-08-30 00:00:10',
+            'diff-sec'  => 10,
+            'diff-else' => 0
+        );
+
+        $this->data['add'] = array(
+            'startdate' => '2013-08-30 00:00:00',
+            'enddate'   => '2013-08-30 00:00:20',
+            'format'    => 'Y-m-d H:i:s',
+            'interval'  => 'PT20S'
+        );
+
+        $this->data['sub'] = array(
+            'startdate' => '2013-08-30 00:00:20',
+            'enddate'   => '2013-08-30 00:00:00',
+            'format'    => 'Y-m-d H:i:s',
+            'interval'  => 'PT20S'
+        );
     }
 
     /**
@@ -100,6 +120,45 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
         $dummy = new DateTimeCompat($this->data['modifytest2']['startdate']);
         $dummy->modify($this->data['modifytest2']['modify']);
         $this->assertEquals($this->data['modifytest2']['date'],$dummy->format($this->data['modifytest2']['format']));
+    }
+
+    /**
+     * @test
+     * @covers DateTimeCompat::diff
+     */
+    public function diffReturnsDateIntervalCompat() {
+        $a = new DateTimeCompat($this->data['diff']['a']);
+        $b = new DateTimeCompat($this->data['diff']['b']);
+        $interval = $a->diff($b);
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->y);
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->m);
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->d);
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->h);
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->i);
+        $this->assertEquals($this->data['diff']['diff-sec'], $interval->s);
+
+    }
+
+    /**
+     * @test
+     * @covers DateTimeCompat::add
+     */
+    public function addReturnsCorrectDateTimeCompat() {
+        $dummy = new DateTimeCompat($this->data['add']['startdate']);
+        $interval = new DateIntervalCompat($this->data['add']['interval']);
+        $dummy->add($interval);
+        $this->assertEquals($this->data['add']['enddate'], $dummy->format($this->data['add']['format']));
+    }
+
+    /**
+     * @test
+     * @covers DateTimeCompat::sub
+     */
+    public function subReturnsCorrectDateTimeCompat() {
+        $dummy = new DateTimeCompat($this->data['sub']['startdate']);
+        $interval = new DateIntervalCompat($this->data['sub']['interval']);
+        $dummy->sub($interval);
+        $this->assertEquals($this->data['sub']['enddate'], $dummy->format($this->data['sub']['format']));
     }
 
 }

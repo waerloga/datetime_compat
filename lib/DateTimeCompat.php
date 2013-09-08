@@ -49,20 +49,59 @@ class DateTimeCompat {
         return $this;
     }
 
-    public function add() {
+    /**
+     * Adds an amount of days, months, years, hours, minutes, and seconds to a DateTimeCompat object
+     * FIXME: Refactor to handle more than just seconds
+     *
+     * @param DateIntervalCompat $input
+     * @return DateTimeCompat|boolean
+     */
+    public function add(DateIntervalCompat $input) {
 
+        if($input->invert) {
+            $m = -1;
+        } else {
+            $m = 1;
+        }
+
+        $this->timestamp += ($m *$input->s);
+        return $this;
     }
 
-    public function sub() {
-
+    /**
+     * Subtracts an amount of days, months, years, hours, minutes, and seconds from a DateTimeCompat object
+     *
+     * @param DateIntervalCompat $input
+     * @return DateTimeCompat|boolean
+     */
+    public function sub($input) {
+        if($input->invert) {
+            $input->invert = 0;
+        } else {
+            $input->invert = 1;
+        }
+        return $this->add($input);
     }
 
-    public function diff() {
-
+    /**
+     * Returns the difference between two DateTimeCompat objects
+     * FIXME: Refactor to deal with something other than just seconds.
+     *
+     * @param DateTimeCompat $input
+     * @param bool $absolute
+     * @return DateIntervalCompat
+     */
+    public function diff(DateTimeCompat $input, $absolute = false) {
+        $temp = abs($input->getTimestamp() - $this->getTimestamp());
+        $temp = new DateIntervalCompat('PT' . $temp . 'S');
+        if($absolute) {
+            $temp->invert = 1;
+        }
+        return $temp;
     }
 
     public function getTimestamp() {
-
+        return $this->timestamp;
     }
 
 
