@@ -20,6 +20,37 @@ class DateTimeCompat {
     /** @var int */
     protected $timestamp;
 
+    protected $tz_list = array(
+        14  => 'Etc/GMT-14',
+        13  => 'Etc/GMT-13',
+        12  => 'Etc/GMT-12',
+        11  => 'Etc/GMT-11',
+        10  => 'Etc/GMT-10',
+        9   => 'Etc/GMT-9',
+        8   => 'Etc/GMT-8',
+        7   => 'Etc/GMT-7',
+        6   => 'Etc/GMT-6',
+        5   => 'Etc/GMT-5',
+        4   => 'Etc/GMT-4',
+        3   => 'Etc/GMT-3',
+        2   => 'Etc/GMT-2',
+        1   => 'Etc/GMT-1',
+        0   => 'Etc/GMT-0',
+        -0   => 'Etc/GMT+0',
+        -1   => 'Etc/GMT+1',
+        -2   => 'Etc/GMT+2',
+        -3   => 'Etc/GMT+3',
+        -4   => 'Etc/GMT+4',
+        -5   => 'Etc/GMT+5',
+        -6   => 'Etc/GMT+6',
+        -7   => 'Etc/GMT+7',
+        -8   => 'Etc/GMT+8',
+        -9   => 'Etc/GMT+9',
+        -10  => 'Etc/GMT+10',
+        -11  => 'Etc/GMT+11',
+        -12  => 'Etc/GMT+12'
+    );
+
     /**
      * Returns a new DateTimeCompat object
      *
@@ -33,20 +64,23 @@ class DateTimeCompat {
     public function __construct($input = "now", DateTimeZoneCompat $timezone = null) {
         if (ini_get('date.timezone')) {
             $this->system_tz = ini_get('date.timezone');
-        }
-        else {
+        } else {
             $this->system_tz = date_default_timezone_get();
+        }
+
+        if ($timezone === null) {
+            $tz_str = $this->tzFromString($input);
+            if($tz_str === '') {
+                $this->setTimezone(new DateTimeZoneCompat($this->system_tz));
+            } else {
+                $this->setTimezone(new DateTimeZoneCompat($tz_str));
+            }
+        } else {
+            $this->setTimezone($timezone);
         }
 
         if (!$this->strtotime($input)) {
             throw new Exception(__CLASS__ . "::" . __METHOD__ . ": Failed to parse time string (" . $input . ")");
-        }
-
-        if ($timezone === null) {
-            $this->setTimezone(new DateTimeZoneCompat($this->system_tz));
-        }
-        else {
-            $this->setTimezone($timezone);
         }
 
         return $this;
@@ -61,10 +95,12 @@ class DateTimeCompat {
      * @return bool
      */
     protected function strtotime($input, $now = null) {
+        date_default_timezone_set($this->getTimezone()->getName());
         if ($now === null) {
             $now = time();
         }
         $temp = strtotime($input, $now);
+        date_default_timezone_set($this->system_tz);
         if ($temp === false || $temp === -1) {
             return false;
         }
@@ -144,12 +180,14 @@ class DateTimeCompat {
      * @return DateTimeCompat|bool
      */
     public function setTimestamp($input) {
+        date_default_timezone_set($this->getTimezone()->getName());
         if (!$temp = date('Y-m-d H:i:s', $input)) {
+            date_default_timezone_set($this->system_tz);
             return false;
         }
         $this->timestamp = $input;
         $this->date = $temp;
-
+        date_default_timezone_set($this->system_tz);
         return $this;
     }
 
@@ -261,9 +299,12 @@ class DateTimeCompat {
      * @return DateTimeCompat|boolean
      */
     public function setDate($year, $month, $day) {
+        date_default_timezone_set($this->getTimezone()->getName());
         if (!$this->strtotime($year . '-' . $month . '-' . $day . ' ' . date('H:i:s', $this->getTimestamp()))) {
+            date_default_timezone_set($this->system_tz);
             return false;
         }
+        date_default_timezone_set($this->system_tz);
 
         return $this;
     }
@@ -278,9 +319,12 @@ class DateTimeCompat {
      * @return DateTimeCompat|boolean
      */
     public function setTime($hour, $minute, $second = 0) {
+        date_default_timezone_set($this->getTimezone()->getName());
         if (!$this->strtotime(date('Y-m-d', $this->getTimestamp()) . ' ' . $hour . ':' . $minute . ':' . $second)) {
+            date_default_timezone_set($this->system_tz);
             return false;
         }
+        date_default_timezone_set($this->system_tz);
 
         return $this;
     }
@@ -301,5 +345,36 @@ class DateTimeCompat {
      */
     public function getOffset() {
         return $this->getTimezone()->getOffset($this);
+    }
+
+    /**
+     * Parses a datetime string for the TZ portion
+     *
+     * @param $input
+     *
+     * @return string
+     * @todo limitations of DateTimeZoneCompat require a valid TZ designation
+     */
+    protected function tzFromString($input) {
+        $tz_regex = '%((GMT)?[+-]0?([1-9]|1[0-2]):?[0-5][0-9]\b)|([A-Z][a-z]+([_/][A-Z][a-z]+)+)|(("?[A-Za-z]{2,6})"?)|(?:)\d\d(Z)%';
+        if(preg_match($tz_regex, $input, $regs)) {
+            $temp = $regs[0];
+        } else {
+            $temp = '';
+        }
+
+        if(substr($temp, -1) === 'Z') {
+            $temp = 'UTC';
+        }
+        if($temp == 'now') {
+            $temp = '';
+        }
+        if(substr($temp, -2) == '00') {
+            $temp = str_replace(":", "", $temp);
+            $temp = substr($temp, 0, -2);
+            $temp = $this->tz_list[(int)$temp];
+        }
+
+        return $temp;
     }
 }

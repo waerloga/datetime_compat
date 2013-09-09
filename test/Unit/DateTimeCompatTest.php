@@ -24,29 +24,29 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
         );
         $this->data['modifytest1'] = array(
             'timestamp' => 1377835200,
-            'startdate' => '2013-08-30 00:00:00',
+            'startdate' => '2013-08-30 00:00:00-0500',
             'format'    => 'Y-m-d H:i:s',
             'modify'    => '+2 day',
             'date'      => '2013-09-01 00:00:00'
         );
         $this->data['modifytest2'] = array(
             'timestamp' => 1377835200,
-            'startdate' => '2013-08-30 00:00:00',
+            'startdate' => '2013-08-30 00:00:00Z',
             'format'    => 'Y-m-d H:i:s',
             'modify'    => '-1 day',
             'date'      => '2013-08-29 00:00:00'
         );
         $this->data['diff'] = array(
-            'a'           => '2013-08-30 00:01:00',
-            'b'           => '2013-08-30 00:00:10',
-            'diff-sec'    => 50,
-            'diff-min'    => 0,
+            'a'           => '2013-08-30 00:01:00-0500',
+            'b'           => '2013-08-30 00:00:10-06:00',
+            'diff-sec'    => 10,
+            'diff-min'    => 59,
             'diff-else'   => 0,
-            'diff-invert' => 1
+            'diff-invert' => 0
         );
 
         $this->data['add'] = array(
-            'startdate' => '2013-08-30 00:00:00',
+            'startdate' => '2013-08-30 00:00:00+07:00',
             'enddate'   => '2013-09-30 00:10:20',
             'format'    => 'Y-m-d H:i:s',
             'interval'  => 'P1MT10M20S'
@@ -60,7 +60,7 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
         );
 
         $this->data['setdate'] = array(
-            'startdate' => '2013-08-30 00:10:00',
+            'startdate' => '2013-08-30 00:10:00+06:00',
             'enddate'   => '2013-08-09 00:10:00',
             'format'    => 'Y-m-d H:i:s',
             'set-year'  => 2013,
@@ -81,6 +81,14 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
             'datetime' => '2013-08-30 00:00:00',
             'timezone' => 'America/Chicago',
             'offset'   => '-18000'
+        );
+
+        $this->data['settz'] = array(
+            'datetime' => '2013-08-30 00:00:00',
+            'timezone' => 'UTC',
+            'newtz'    => 'America/Chicago',
+            'result'   => '2013-08-29 19:00:00',
+            'format'   => 'Y-m-d H:i:s'
         );
     }
 
@@ -156,13 +164,13 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
         $a = new DateTimeCompat($this->data['diff']['a']);
         $b = new DateTimeCompat($this->data['diff']['b']);
         $interval = $a->diff($b);
-        $this->assertEquals($this->data['diff']['diff-else'], $interval->y);
-        $this->assertEquals($this->data['diff']['diff-else'], $interval->m);
-        $this->assertEquals($this->data['diff']['diff-else'], $interval->d);
-        $this->assertEquals($this->data['diff']['diff-else'], $interval->h);
-        $this->assertEquals($this->data['diff']['diff-min'], $interval->i);
-        $this->assertEquals($this->data['diff']['diff-sec'], $interval->s);
-        $this->assertEquals($this->data['diff']['diff-invert'], $interval->invert);
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->y, 'Failed Years');
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->m, 'Failed Months');
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->d, 'Failed Days');
+        $this->assertEquals($this->data['diff']['diff-else'], $interval->h, 'Failed Hours');
+        $this->assertEquals($this->data['diff']['diff-min'], $interval->i, 'Failed Minutes');
+        $this->assertEquals($this->data['diff']['diff-sec'], $interval->s, 'Failed Seconds');
+        $this->assertEquals($this->data['diff']['diff-invert'], $interval->invert, 'Failed Invert');
 
     }
 
@@ -215,5 +223,15 @@ class DateTimeCompatTest extends PHPUnit_Framework_TestCase {
     public function getOffsetReturnsExpeted() {
         $dummy = new DateTimeCompat($this->data['offset']['datetime'], new DateTimeZoneCompat($this->data['offset']['timezone']));
         $this->assertEquals($this->data['offset']['offset'], $dummy->getOffset());
+    }
+
+    /**
+     * @test
+     * @covers DateTimeCompat::setTimezone
+     */
+    public function changeTzReturnsExpected() {
+        $dummy = new DateTimeCompat($this->data['settz']['datetime'], new DateTimeZoneCompat($this->data['settz']['timezone']));
+        $dummy->setTimezone(new DateTimeZoneCompat($this->data['settz']['newtz']));
+        $this->assertEquals($this->data['settz']['result'], $dummy->format($this->data['settz']['format']));
     }
 }
