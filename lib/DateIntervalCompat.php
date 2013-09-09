@@ -36,7 +36,7 @@ class DateIntervalCompat {
         $temp = array();
         $rtn = preg_match('/^(-|)?P([0-9]+Y|)?([0-9]+M|)?([0-9]+W|)?([0-9]+D|)?T?([0-9]+H|)?([0-9]+M|)?([0-9]+S|)?$/', $input, $temp);
         if (empty($temp) || $rtn === false || $rtn === 0) {
-            throw new Exception(__CLASS__ . "::" . __METHOD__ . ": Unknown or bad format (" . $input . ")");
+            throw new Exception(__CLASS__ . '::' . __METHOD__ . ': Unknown or bad format (' . $input . ')');
         }
 
         $this->y = (int)$temp[2];
