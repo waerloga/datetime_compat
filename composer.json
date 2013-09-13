@@ -1,0 +1,17 @@
+{
+    "name":"waerloga/datetime_compat",
+    "dscription": "An attempt at a user-land backport of DateTime/DateInterval/DateTimeZone in PHP 5.2+",
+    "version": "0.0.1",
+    "homepage": "https://github.com/waerloga/datetime_compat",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jason Varnedoe",
+            "email": "jason@fuzzystatic.com",
+            "homepage": "http://fuzzystatic.com"
+        }
+    ],
+    "autoload": {
+        "files": ["lib/bootstrap.php"]
+    }
+}
